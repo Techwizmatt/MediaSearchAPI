@@ -1,0 +1,28 @@
+{
+  "name": "media-search-api",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "axios": "^0.24.0",
+    "body-parser": "^1.19.1",
+    "dotenv": "^13.0.1",
+    "express": "^4.17.2",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.24.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-standard": "^4.0.0"
+  }
+}
