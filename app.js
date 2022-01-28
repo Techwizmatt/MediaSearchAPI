@@ -8,7 +8,6 @@ const cors = require('cors')
 const app = require('express')()
 const parser = require('body-parser')
 const https = require('https')
-const http = require('http')
 const fs = require('fs')
 
 app.use(cors({
@@ -35,11 +34,5 @@ const httpsServer = https.createServer({
 }, app)
 
 httpsServer.listen(3333, () => {
-  console.log('HTTPS Server running on port 443')
+  console.log('HTTPS Server running on port 3333')
 })
-
-const server = app.listen(3333, () => {
-  console.log('API RUNNING ON 3333')
-})
-
-server.timeout = 10000
