@@ -24,15 +24,16 @@ class radarr {
         }
       }).then(data => {
         const results = {
-          raw: data,
+          raw: data.data,
           formatted: []
         }
 
         data.data.forEach(movie => {
           results.formatted.push({
             title: movie.title,
+            overview: movie.overview ? movie.overview : null,
             year: movie.year ? movie.year : null,
-            poster: movie.remotePoster ? movie.remotePoster : null,
+            poster: movie.remotePoster ? movie.remotePoster : 'https://critics.io/img/movies/poster-placeholder.png',
             studio: movie.studio ? movie.studio : null,
             onDrive: movie.hasFile,
             id: movie.tmdbId,

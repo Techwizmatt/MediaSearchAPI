@@ -17,7 +17,11 @@ const search = {
 
         const results = {
           series: seriesResults,
-          movies: movieResults
+          movies: movieResults,
+          raw: {
+            series: data[0].raw,
+            movies: data[1].raw
+          }
         }
 
         resolve(results)

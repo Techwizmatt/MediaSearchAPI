@@ -26,8 +26,8 @@ app.use((request, response, next) => {
   next(error)
 })
 
-const server = app.listen(3030, () => {
-  console.log('API RUNNING ON 3030')
+const server = app.listen(3333, () => {
+  console.log('API RUNNING ON 3333')
 })
 
 server.timeout = 10000
