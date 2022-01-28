@@ -30,7 +30,8 @@ app.use((request, response, next) => {
 
 const httpsServer = https.createServer({
   key: fs.readFileSync(path.join(process.cwd(), '/ssl/key.pem')),
-  cert: fs.readFileSync(path.join(process.cwd(), '/ssl/cert.crt'))
+  cert: fs.readFileSync(path.join(process.cwd(), '/ssl/cert.crt')),
+  ca: fs.readFileSync(path.join(process.cwd(), '/ssl/ca.crt'))
 }, app)
 
 httpsServer.listen(3333, () => {
