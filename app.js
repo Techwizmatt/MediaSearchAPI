@@ -29,9 +29,9 @@ app.use((request, response, next) => {
 })
 
 const httpsServer = https.createServer({
-  key: fs.readFileSync(path.join(process.cwd(), '/ssl/techhost.key')),
-  cert: fs.readFileSync(path.join(process.cwd(), '/ssl/techhost.crt')),
-  ca: fs.readFileSync(path.join(process.cwd(), '/ssl/gd_bundle-g2-g1.crt'))
+  key: fs.readFileSync(path.join(process.cwd(), '/ssl/techhost.key'), 'utf8'),
+  cert: fs.readFileSync(path.join(process.cwd(), '/ssl/techhost.csr'), 'utf8'),
+  ca: fs.readFileSync(path.join(process.cwd(), '/ssl/gd_bundle-g2-g1.crt'), 'utf8')
 }, app)
 
 httpsServer.listen(3333, () => {
