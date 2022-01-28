@@ -7,6 +7,9 @@ require('dotenv').config({
 const cors = require('cors')
 const app = require('express')()
 const parser = require('body-parser')
+const https = require('https')
+const http = require('http')
+const fs = require('fs')
 
 app.use(cors({
   origin: '*', optionsSuccessStatus: 200
@@ -24,6 +27,15 @@ app.use((request, response, next) => {
   const error = new Error('Not Found')
   error.status = 404
   next(error)
+})
+
+const httpsServer = https.createServer({
+  key: fs.readFileSync(path.join(process.cwd(), '/ssl/key.pem')),
+  cert: fs.readFileSync(path.join(process.cwd(), '/ssl/cert.crt'))
+}, app)
+
+httpsServer.listen(3333, () => {
+  console.log('HTTPS Server running on port 443')
 })
 
 const server = app.listen(3333, () => {
