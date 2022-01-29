@@ -28,7 +28,7 @@ app.use((request, response, next) => {
   next(error)
 })
 
-let options = {}
+let options
 
 try {
   options = {
@@ -37,7 +37,8 @@ try {
     ca: fs.readFileSync(path.join(process.cwd(), '/ssl/gd_bundle-g2-g1.crt'), 'utf8')
   }
 } catch (error) {
-  console.log(error)
+  console.log('Unable to load SSL')
+  options = {}
 }
 
 const httpsServer = https.createServer(options, app)

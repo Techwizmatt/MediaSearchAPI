@@ -35,9 +35,13 @@ class radarr {
             year: movie.year ? movie.year : null,
             poster: movie.remotePoster ? movie.remotePoster : 'https://critics.io/img/movies/poster-placeholder.png',
             studio: movie.studio ? movie.studio : null,
-            onDrive: movie.hasFile,
+            onDrive: !!movie.path,
             id: movie.tmdbId,
-            type: 'movie'
+            type: 'movie',
+            addOptions: {
+              ignoreEpisodesWithFiles: true,
+              searchForMissingEpisodes: true
+            }
           })
         })
 
@@ -46,6 +50,63 @@ class radarr {
         }
 
         resolve(results)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  }
+
+  doGetMovieByTMDBId (tmdbId) {
+    return new Promise((resolve, reject) => {
+      this.api.http.get('/movie/lookup', {
+        params: {
+          term: `tmdb:${tmdbId}`
+        }
+      }).then(data => {
+        if (data.data.length >= 1) {
+          resolve(data.data[0])
+        } else {
+          reject(new Error('Unable to find movie'))
+        }
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  }
+
+  _doForceSearch (id) {
+    return new Promise((resolve, reject) => {
+      this.api.http.post('/command', {
+        movieIds: [id],
+        name: 'MoviesSearch'
+      }).then(data => {
+        resolve(data.data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  }
+
+  doAddMovie (tmdbId) {
+    return new Promise((resolve, reject) => {
+      this.doGetMovieByTMDBId(tmdbId).then(data => {
+        this.api.http.post('/movie', {
+          tmdbId: tmdbId,
+          title: data.title,
+          titleSlug: data.titleSlug,
+          images: data.images,
+          profileId: 1,
+          monitored: true,
+          path: `/movies/${data.title}`
+        }).then(data => {
+          this._doForceSearch(data.data.id).then(_ => {
+            resolve(data.data)
+          }).catch(error => {
+            reject(error)
+          })
+        }).catch(error => {
+          reject(error)
+        })
       }).catch(error => {
         reject(error)
       })

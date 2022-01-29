@@ -79,15 +79,14 @@ class sonarr {
           title: data.title,
           titleSlug: data.titleSlug,
           images: data.images,
-          seasons: data.seasons,
           profileId: 1,
           seasonFolder: true,
-          monitored: false,
+          monitored: true,
           path: `/tv/${data.title}`,
           seriesType: data.seriesType,
           addOptions: {
             ignoreEpisodesWithFiles: true,
-            searchForMissingEpisodes: false
+            searchForMissingEpisodes: true
           }
         }).then(data => {
           resolve(data.data)
