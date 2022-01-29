@@ -28,12 +28,20 @@ app.use((request, response, next) => {
   next(error)
 })
 
-const httpsServer = https.createServer({
-  key: fs.readFileSync(path.join(process.cwd(), '/ssl/techhost.key'), 'utf8'),
-  cert: fs.readFileSync(path.join(process.cwd(), '/ssl/techhost.csr'), 'utf8'),
-  ca: fs.readFileSync(path.join(process.cwd(), '/ssl/gd_bundle-g2-g1.crt'), 'utf8')
-}, app)
+let options = {}
+
+try {
+  options = {
+    key: fs.readFileSync(path.join(process.cwd(), '/ssl/*.techhost.co.key'), 'utf8'),
+    cert: fs.readFileSync(path.join(process.cwd(), '/ssl/*.techhost.co.crt'), 'utf8'),
+    ca: fs.readFileSync(path.join(process.cwd(), '/ssl/gd_bundle-g2-g1.crt'), 'utf8')
+  }
+} catch (error) {
+  console.log(error)
+}
+
+const httpsServer = https.createServer(options, app)
 
 httpsServer.listen(3333, () => {
-  console.log('HTTPS Server running on port 3333')
+  console.log('Server running on port 3333')
 })
