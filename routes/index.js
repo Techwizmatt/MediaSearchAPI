@@ -3,6 +3,7 @@ const path = require('path')
 const app = express()
 
 app.use('/search', require(path.join(process.cwd(), '/routes/search')))
+app.use('/status', require(path.join(process.cwd(), '/routes/status')))
 app.use('/series', require(path.join(process.cwd(), '/routes/series')))
 app.use('/movie', require(path.join(process.cwd(), '/routes/movie')))
 
