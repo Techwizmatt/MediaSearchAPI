@@ -83,7 +83,7 @@ class sonarr {
           profileId: 1,
           seasonFolder: true,
           monitored: false,
-          path: `/${data.title}`,
+          path: `/tv/${data.title}`,
           seriesType: data.seriesType,
           addOptions: {
             ignoreEpisodesWithFiles: true,
