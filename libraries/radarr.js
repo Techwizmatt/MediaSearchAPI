@@ -16,6 +16,19 @@ class radarr {
     })
   }
 
+  _doForceMonitoring (id) {
+    return new Promise((resolve, reject) => {
+      this.api.http.post('/command', {
+        movieIds: [id],
+        name: 'MoviesSearch'
+      }).then(data => {
+        resolve(data.data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  }
+
   doSearchForMovie (query) {
     return new Promise((resolve, reject) => {
       this.api.http.get('/movie/lookup', {
@@ -74,19 +87,6 @@ class radarr {
     })
   }
 
-  _doForceSearch (id) {
-    return new Promise((resolve, reject) => {
-      this.api.http.post('/command', {
-        movieIds: [id],
-        name: 'MoviesSearch'
-      }).then(data => {
-        resolve(data.data)
-      }).catch(error => {
-        reject(error)
-      })
-    })
-  }
-
   doAddMovie (tmdbId) {
     return new Promise((resolve, reject) => {
       this.doGetMovieByTMDBId(tmdbId).then(data => {
@@ -99,7 +99,7 @@ class radarr {
           monitored: true,
           path: `/movies/${data.title}`
         }).then(data => {
-          this._doForceSearch(data.data.id).then(_ => {
+          this._doForceMonitoring(data.data.id).then(_ => {
             resolve(data.data)
           }).catch(error => {
             reject(error)
@@ -107,6 +107,24 @@ class radarr {
         }).catch(error => {
           reject(error)
         })
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  }
+
+  doGetDownloadQueue () {
+    return new Promise((resolve, reject) => {
+      this.api.http.get('/queue', {
+        params: {
+          page: 1,
+          pageSize: 100,
+          sortDirection: 'ascending',
+          sortKey: 'timeLeft',
+          includeUnknownMovieItems: true
+        }
+      }).then(data => {
+        resolve(data.data)
       }).catch(error => {
         reject(error)
       })

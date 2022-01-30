@@ -1,4 +1,5 @@
 const axios = require('axios')
+const path = require('path')
 
 class sonarr {
   constructor () {
@@ -15,6 +16,19 @@ class sonarr {
         'x-api-key': process.env.SONARR_KEY
       }
     })
+  }
+
+  /**
+   * Converts string time into seconds
+   * @param str - 'HH:MM:SS' Format
+   * @returns {Number}
+   */
+  _doConvertStringTimeToSeconds (str) {
+    const [hh = '0', mm = '0', ss = '0'] = (str || '0:0:0').split(':')
+    const hour = parseInt(hh, 10) || 0
+    const minute = parseInt(mm, 10) || 0
+    const second = parseInt(ss, 10) || 0
+    return (hour * 3600) + (minute * 60) + (second)
   }
 
   doSearchForSeries (query) {
@@ -94,6 +108,60 @@ class sonarr {
           reject(error)
         })
       }).catch(error => {
+        reject(error)
+      })
+    })
+  }
+
+  doGetDownloadQueue () {
+    return new Promise((resolve, reject) => {
+      this.api.http.get('/queue').then(data => {
+        resolve(data.data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  }
+
+  doGetOrganizedDownloadQueue () {
+    return new Promise((resolve, reject) => {
+      this.doGetDownloadQueue().then(data => {
+        const response = {}
+
+        if (data.length >= 1) {
+          data.forEach(download => {
+            const id = download.series.tvdbId
+            const seriesTitle = download.series.title
+
+            const content = {
+              title: download.episode.title,
+              info: `Season ${download.episode.seasonNumber} Episode ${download.episode.episodeNumber}`,
+              size: download.size,
+              resolution: download.quality.quality.resolution,
+              sizeleft: download.sizeleft,
+              timeleft: this._doConvertStringTimeToSeconds(download.timeleft),
+              status: download.status,
+              trackedDownloadStatus: download.trackedDownloadStatus
+            }
+
+            if (String(id) in response) {
+              response[id].downloads.push(content)
+              response[id].totalSize = response[id].totalSize + download.size
+              response[id].totalSizeLeft = response[id].totalSizeLeft + download.sizeleft
+            } else {
+              response[id] = {
+                title: seriesTitle,
+                totalSize: download.size,
+                totalSizeLeft: download.sizeleft,
+                downloads: [content]
+              }
+            }
+          })
+        }
+
+        resolve(response)
+      }).catch(error => {
+        console.log(error)
         reject(error)
       })
     })

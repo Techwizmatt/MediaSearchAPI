@@ -13,8 +13,6 @@ const search = {
         const seriesResults = data[0].formatted
         const movieResults = data[1].formatted
 
-        // const alternatingResults = [seriesResults, movieResults].reduce((r, a) => (a.forEach((a, i) => (r[i] = r[i] || []).push(a)), r), []).reduce((a, b) => a.concat(b))
-
         const results = {
           series: seriesResults,
           movies: movieResults,
