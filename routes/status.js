@@ -4,7 +4,13 @@ const controllers = require(path.join(process.cwd(), '/controllers'))
 
 router.get('/', async (request, response) => {
   controllers.status.doGetCurrent().then(data => {
-    response.status(200).json(data)
+    controllers.users.doRead(request.user.id).then(user => {
+      data.user = user
+
+      response.status(200).json(data)
+    }).catch(error => {
+      response.status(500).json({ error: error })
+    })
   }).catch(error => {
     response.status(500).json({ error: error })
   })

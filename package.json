@@ -15,9 +15,14 @@
     "cors": "^2.8.5",
     "dotenv": "^13.0.1",
     "express": "^4.17.2",
+    "express-jwt": "^6.1.0",
     "https": "^1.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "mysql2": "^2.0.1",
     "nzbget-nodejs": "0.0.2",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "sequelize": "^5.21.2",
+    "twilio": "^3.73.1"
   },
   "devDependencies": {
     "eslint": "^7.32.0",

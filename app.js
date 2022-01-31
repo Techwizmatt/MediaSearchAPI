@@ -20,12 +20,16 @@ app.use(parser.urlencoded({
 
 app.use(parser.json())
 
+app.use(require(path.join(process.cwd(), '/middleware/authentication'))())
+
+app.all('*', require(path.join(process.cwd(), '/middleware/authorization')))
+
 app.use('/', require(path.join(process.cwd(), '/routes')))
 
-app.use((request, response, next) => {
-  const error = new Error('Not Found')
-  error.status = 404
-  next(error)
+app.use((error, request, response, next) => {
+  response.status(error.status).send({ error: error.message })
+
+  next()
 })
 
 let options
