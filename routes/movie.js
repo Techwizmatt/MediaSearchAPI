@@ -6,7 +6,7 @@ router.post('/', async (request, response) => {
   controllers.movie.doAdd(request.body.id).then(data => {
     response.status(200).json(data)
   }).catch(error => {
-    response.status(500).json({ error: error })
+    response.status(500).json({ error: error.message })
   })
 })
 

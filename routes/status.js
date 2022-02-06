@@ -9,7 +9,7 @@ router.get('/', async (request, response) => {
 
       response.status(200).json(data)
     }).catch(error => {
-      response.status(500).json({ error: error })
+      response.status(500).json({ error: error.message })
     })
   }).catch(error => {
     response.status(500).json({ error: error })
@@ -20,7 +20,7 @@ router.get('/downloads', async (request, response) => {
   controllers.status.doGetDownloads().then(data => {
     response.status(200).json(data)
   }).catch(error => {
-    response.status(500).json({ error: error })
+    response.status(500).json({ error: error.message })
   })
 })
 

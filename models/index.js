@@ -16,7 +16,13 @@ const sequelize = new Sequelize(
 )
 
 const models = {
-  users: sequelize.import(path.join(process.cwd(), '/models/users'))
+  downloads: sequelize.import(path.join(process.cwd(), '/models/downloads')),
+  notifications: sequelize.import(path.join(process.cwd(), '/models/notifications')),
+  notificationTypes: sequelize.import(path.join(process.cwd(), '/models/notificationTypes')),
+  preferences: sequelize.import(path.join(process.cwd(), '/models/preferences')),
+  searchHistory: sequelize.import(path.join(process.cwd(), '/models/searchHistory')),
+  users: sequelize.import(path.join(process.cwd(), '/models/users')),
+  usersPreferences: sequelize.import(path.join(process.cwd(), '/models/usersPreferences'))
 }
 
 Object.keys(models).forEach(model => {

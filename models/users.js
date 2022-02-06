@@ -6,10 +6,12 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true
     },
     firstName: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      allowNull: false
     },
     lastName: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      allowNull: false
     },
     fullName: {
       type: DataTypes.VIRTUAL,
@@ -24,12 +26,32 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     phone: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    plexInviteToken: {
       type: DataTypes.STRING
+    },
+    isPlexAccepted: {
+      type: DataTypes.BOOLEAN
     },
     tempCode: {
       type: DataTypes.STRING
     },
+    firstLogin: {
+      type: DataTypes.BOOLEAN
+    },
+    forceLogout: {
+      type: DataTypes.BOOLEAN
+    },
     isActive: {
+      type: DataTypes.BOOLEAN
+    },
+    isAdmin: {
       type: DataTypes.BOOLEAN
     },
     createdAt: {
@@ -41,6 +63,14 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     tableName: 'users'
   })
+
+  users.associate = function (models) {
+    users.hasOne(models.usersPreferences, {
+      foreignKey: 'id',
+      targetKey: 'userId',
+      as: 'preferences'
+    })
+  }
 
   return users
 }
