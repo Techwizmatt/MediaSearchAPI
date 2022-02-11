@@ -8,6 +8,9 @@ module.exports = (sequelize, DataTypes) => {
     mediaId: {
       type: DataTypes.INTEGER.UNSIGNED
     },
+    downloadId: {
+      type: DataTypes.INTEGER.UNSIGNED
+    },
     userId: {
       type: DataTypes.INTEGER.UNSIGNED
     },
@@ -16,6 +19,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     title: {
       type: DataTypes.STRING
+    },
+    failedAt: {
+      type: DataTypes.DATE
     },
     completedAt: {
       type: DataTypes.DATE

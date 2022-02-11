@@ -16,29 +16,85 @@ const downloads = {
       })
     })
   },
-  doAdd: async function (type, userId, mediaId, title) {
+  doGetAllDownloadingByTypeAndMediaId: async function (type, mediaId) {
     return new Promise((resolve, reject) => {
-      models.downloads.create({
-        mediaId: mediaId,
-        userId: userId,
-        type: type,
-        title: title
-      }).then(_ => {
-        resolve()
+      models.downloads.findAll({
+        where: {
+          type: type,
+          mediaId: mediaId,
+          completedAt: {
+            [Sequelize.Op.ne]: null
+          },
+          failedAt: {
+            [Sequelize.Op.ne]: null
+          }
+        },
+        raw: true
+      }).then(data => {
+        resolve(data)
       }).catch(error => {
         reject(error)
       })
     })
   },
-  doGetAllActive: async function () {
+  doGetAllByTypeAndMediaId: async function (type, mediaId) {
     return new Promise((resolve, reject) => {
       models.downloads.findAll({
         where: {
-          completedAt: null
+          type: type,
+          mediaId: mediaId
+        },
+        raw: true
+      }).then(data => {
+        resolve(data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  doAdd: async function (type, userId, mediaId, downloadId, title) {
+    return new Promise((resolve, reject) => {
+      models.downloads.create({
+        mediaId: mediaId,
+        downloadId: downloadId,
+        userId: userId,
+        type: type,
+        title: title
+      }).then(data => {
+        resolve(data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  doUpdate: async function (id, data) {
+    return new Promise((resolve, reject) => {
+      models.downloads.update(data, {
+        where: {
+          id: id
         }
       }).then(data => {
         resolve(data)
-      }).reject(error => {
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  doGetDownloadQueue: async function () {
+    return new Promise((resolve, reject) => {
+      models.downloads.findAll({
+        where: {
+          completedAt: {
+            [Sequelize.Op.ne]: null
+          },
+          failedAt: {
+            [Sequelize.Op.ne]: null
+          }
+        },
+        raw: true
+      }).then(data => {
+        resolve(data)
+      }).catch(error => {
         reject(error)
       })
     })

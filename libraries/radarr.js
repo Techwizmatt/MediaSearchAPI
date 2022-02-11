@@ -151,15 +151,20 @@ class radarr {
 
         if (data.length >= 1) {
           data.forEach(download => {
-            const id = download.movie.tmdbId
+            const id = download.movie.id
             const movieTitle = download.movie.title
 
             response[id] = {
               title: movieTitle,
+              type: 'movie',
+              serviceId: download.movie.tmdbId,
+              downloadId: download.id,
               totalSize: download.size,
               totalSizeLeft: download.sizeleft,
               downloads: [{
                 title: movieTitle,
+                mediaId: download.movie.id,
+                downloadId: download.id,
                 info: download.movie.year,
                 size: download.size,
                 sizeLeft: download.sizeleft,

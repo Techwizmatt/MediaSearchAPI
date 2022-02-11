@@ -130,11 +130,13 @@ class sonarr {
 
         if (data.length >= 1) {
           data.forEach(download => {
-            const id = download.series.tvdbId
+            const id = download.series.id
             const seriesTitle = download.series.title
 
             const content = {
               title: download.episode.title,
+              downloadId: download.id,
+              mediaId: download.series.id,
               info: `Season ${download.episode.seasonNumber} Episode ${download.episode.episodeNumber}`,
               size: download.size,
               resolution: download.quality.quality.resolution,
@@ -151,6 +153,8 @@ class sonarr {
             } else {
               response[id] = {
                 title: seriesTitle,
+                type: 'series',
+                serviceId: download.series.tvdbId,
                 totalSize: download.size,
                 totalSizeLeft: download.sizeleft,
                 downloads: [content]
