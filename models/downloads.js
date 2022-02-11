@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER.UNSIGNED
     },
     type: {
-      type: DataTypes.ENUM('series', 'movie')
+      type: DataTypes.ENUM('episode', 'movie')
     },
     title: {
       type: DataTypes.STRING

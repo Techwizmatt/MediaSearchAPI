@@ -4,7 +4,72 @@ const sequelize = require(path.join(process.cwd(), '/models')).sequelize
 const models = require(path.join(process.cwd(), '/models')).models
 const libs = require(path.join(process.cwd(), '/libraries'))
 
+const sonarr = new libs.Sonarr()
+const radarr = new libs.Radarr()
+
 const downloads = {
+  doAdd: async function (type, userId, mediaId, title) {
+    return new Promise((resolve, reject) => {
+      models.downloads.create({
+        mediaId: mediaId,
+        userId: userId,
+        type: type,
+        title: title
+      }).then(data => {
+        resolve(data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  doAddSeries: async function (userId, mediaId) {
+    return new Promise((resolve, reject) => {
+      sonarr.doGetSeriesEpisodes(mediaId).then(episodes => {
+        const downloads = []
+
+        episodes.forEach(episode => {
+          downloads.push(new Promise((resolve, reject) => {
+            models.downloads.create({
+              mediaId: episode.id,
+              userId: userId,
+              type: 'episode',
+              title: episode.title
+            }).then(data => {
+              resolve(data)
+            }).catch(error => {
+              reject(error)
+            })
+          }))
+        })
+
+        Promise.all(downloads).then(downloads => {
+          resolve(downloads)
+        }).catch(error => {
+          reject(error)
+        })
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  doAddMovie: async function (userId, mediaId) {
+    return new Promise((resolve, reject) => {
+      radarr.doGetFromMediaId(mediaId).then(movie => {
+        models.downloads.create({
+          mediaId: movie.id,
+          userId: userId,
+          type: 'movie',
+          title: movie.title
+        }).then(data => {
+          resolve(data)
+        }).catch(error => {
+          reject(error)
+        })
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
   doGetAll: async function () {
     return new Promise((resolve, reject) => {
       models.downloads.getAll({
@@ -16,52 +81,85 @@ const downloads = {
       })
     })
   },
-  doGetAllDownloadingByTypeAndMediaId: async function (type, mediaId) {
+  doGetByTypeAndMediaId: async function (type, mediaId) {
     return new Promise((resolve, reject) => {
-      models.downloads.findAll({
-        where: {
-          type: type,
-          mediaId: mediaId,
-          completedAt: {
-            [Sequelize.Op.ne]: null
-          },
-          failedAt: {
-            [Sequelize.Op.ne]: null
-          }
-        },
-        raw: true
-      }).then(data => {
-        resolve(data)
-      }).catch(error => {
-        reject(error)
-      })
-    })
-  },
-  doGetAllByTypeAndMediaId: async function (type, mediaId) {
-    return new Promise((resolve, reject) => {
-      models.downloads.findAll({
+      models.downloads.findOne({
         where: {
           type: type,
           mediaId: mediaId
-        },
-        raw: true
-      }).then(data => {
-        resolve(data)
+        }
+      }).then(download => {
+        resolve(download)
       }).catch(error => {
         reject(error)
       })
     })
   },
-  doAdd: async function (type, userId, mediaId, downloadId, title) {
+  doGetAllDownloading: async function () {
     return new Promise((resolve, reject) => {
-      models.downloads.create({
-        mediaId: mediaId,
-        downloadId: downloadId,
-        userId: userId,
-        type: type,
-        title: title
-      }).then(data => {
-        resolve(data)
+      models.downloads.findAll({
+        where: {
+          downloadId: {
+            [Sequelize.Op.ne]: null
+          },
+          failedAt: null,
+          completedAt: null,
+          createdAt: {
+            [Sequelize.Op.gt]: new Date(Date.now() - ((60 * 60 * 1000) * 24))
+          }
+        }
+      }).then(download => {
+        resolve(download)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  doGetAllPending: async function () {
+    return new Promise((resolve, reject) => {
+      models.downloads.findAll({
+        where: {
+          failedAt: null,
+          completedAt: null
+        }
+      }).then(download => {
+        resolve(download)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  doGetAllPendingAndSearching: async function () {
+    return new Promise((resolve, reject) => {
+      models.downloads.findAll({
+        where: {
+          downloadId: null,
+          failedAt: null,
+          completedAt: null,
+          createdAt: {
+            [Sequelize.Op.gt]: new Date(Date.now() - ((60 * 60 * 1000) * 24))
+          }
+        }
+      }).then(download => {
+        resolve(download)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  doGetAllPendingAndOld: async function () {
+    return new Promise((resolve, reject) => {
+      models.downloads.findAll({
+        where: {
+          downloadId: null,
+          failedAt: null,
+          completedAt: null,
+          createdAt: {
+            [Sequelize.Op.lt]: new Date(Date.now() - ((60 * 60 * 1000) * 24))
+          }
+        }
+      }).then(download => {
+        resolve(download)
       }).catch(error => {
         reject(error)
       })
@@ -73,25 +171,6 @@ const downloads = {
         where: {
           id: id
         }
-      }).then(data => {
-        resolve(data)
-      }).catch(error => {
-        reject(error)
-      })
-    })
-  },
-  doGetDownloadQueue: async function () {
-    return new Promise((resolve, reject) => {
-      models.downloads.findAll({
-        where: {
-          completedAt: {
-            [Sequelize.Op.ne]: null
-          },
-          failedAt: {
-            [Sequelize.Op.ne]: null
-          }
-        },
-        raw: true
       }).then(data => {
         resolve(data)
       }).catch(error => {

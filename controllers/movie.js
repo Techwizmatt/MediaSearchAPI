@@ -30,6 +30,15 @@ const movie = {
         reject(error)
       })
     })
+  },
+  doDelete: async function (mediaId) {
+    return new Promise((resolve, reject) => {
+      radarr.doDelete(mediaId).then(data => {
+        resolve(data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
   }
 }
 

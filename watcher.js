@@ -9,62 +9,96 @@ class watcher {
 
     this.job = new cron.CronJob(`*/${this.repeatMin} * * * *`, function () {
       new Promise((resolve, reject) => {
-        Promise.all([new libs.Sonarr().doGetOrganizedDownloadQueue(), new libs.Radarr().doGetOrganizedDownloadQueue()]).then(data => {
-          data.forEach(service => {
+        Promise.all([new libs.Sonarr().doGetOrganizedDownloadQueue(), new libs.Radarr().doGetOrganizedDownloadQueue()]).then(currentQueueData => {
+          currentQueueData.forEach(service => {
             Object.keys(service).forEach(mediaId => {
-              const type = service[mediaId].type
-              const title = service[mediaId].title
               const serviceId = service[mediaId].serviceId
-              const downloads = service[mediaId].downloads
+              const currentDownloads = service[mediaId].downloads
 
-              downloads.forEach(download => {
-                new Promise((resolve, reject) => {
-                  // controllers.downloads.doGetAllByTypeAndMediaId(type, mediaId).then(downloads => {
-                  //   if (downloads.length === 0) {
-                  //     controllers.downloads.doAdd(type, 0, mediaId, download.downloadId, download.title).then(data => {
-                  //       resolve(data)
-                  //     }).catch(error => {
-                  //       reject(error)
-                  //     })
-                  //   } else {
-                  //     resolve(downloads)
-                  //   }
-                  // }).catch(error => {
-                  //   reject(error)
-                  // })
-                }).then(downloads => {
+              const downloading = []
+
+              currentDownloads.forEach(currentDownload => {
+                downloading.push(new Promise((resolve, reject) => {
+                  const currentDownloadType = currentDownload.type
+                  const currentDownloadMediaId = currentDownload.mediaId
+                  const currentDownloadTitle = currentDownload.title
+                  const currentDownloadId = currentDownload.downloadId
+                  const currentDownloadStatus = currentDownload.status
+                  const currentDownloadNotice = currentDownload.notice
+
                   new Promise((resolve, reject) => {
-                    downloads.forEach(data => {
-                      const id = data.id
-
-                      // if (download.status === 'Completed') {
-                      //   if (download.notice === 'Ok') {
-                      //     controllers.downloads.doUpdate(id, {
-                      //       completedAt: new Date()
-                      //     }).then(_ => {
-                      //       resolve()
-                      //     }).catch(error => {
-                      //       reject(error)
-                      //     })
-                      //   } else {
-                      //     controllers.downloads.doUpdate(id, {
-                      //       failedAt: new Date()
-                      //     }).then(_ => {
-                      //       resolve()
-                      //     }).catch(error => {
-                      //       reject(error)
-                      //     })
-                      //   }
-                      // }
+                    controllers.downloads.doGetByTypeAndMediaId(currentDownloadType, currentDownloadMediaId).then(data => {
+                      if (data === null) {
+                        controllers.downloads.doAdd(currentDownloadType, 0, currentDownloadMediaId, currentDownloadTitle).then(data => {
+                          resolve(data)
+                        }).catch(error => {
+                          reject(error)
+                        })
+                      } else {
+                        resolve(data)
+                      }
+                    }).catch(error => {
+                      reject(error)
                     })
-                  }).then(_ => {
-                    resolve()
-                  }).catch(error => {
-                    reject(error)
+                  }).then(data => {
+                    const dbId = data.id
+                    const dbDownloadId = data.downloadId
+                    const failedAt = data.failedAt
+                    const completedAt = data.completedAt
+
+                    new Promise((resolve, reject) => {
+                      if (dbDownloadId === null) {
+                        controllers.downloads.doUpdate(dbId, {
+                          downloadId: currentDownloadId
+                        }).then(_ => {
+                          resolve()
+                        }).catch(error => {
+                          reject(error)
+                        })
+                      } else {
+                        resolve()
+                      }
+                    }).then(_ => {
+                      if (currentDownloadNotice !== 'Ok' && failedAt === null) {
+                        controllers.downloads.doUpdate(dbId, {
+                          failedAt: new Date()
+                        }).then(_ => {
+                          resolve(dbId)
+                        }).catch(error => {
+                          reject(error)
+                        })
+                      } else if (currentDownloadStatus === 'Completed' && currentDownloadNotice === 'Ok' && completedAt === null) {
+                        controllers.downloads.doUpdate(dbId, {
+                          completedAt: new Date()
+                        }).then(_ => {
+                          resolve(dbId)
+                        }).catch(error => {
+                          reject(error)
+                        })
+                      } else {
+                        resolve(dbId)
+                      }
+                    }).catch(error => {
+                      reject(error)
+                    })
                   })
-                }).catch(error => {
-                  reject(error)
+                }))
+              })
+
+              Promise.all(downloading).then(rawDownloads => {
+                rawDownloads.forEach(downloadId => {
+                  console.log(`Watched status on current downloads: id - ${downloadId}`)
                 })
+
+                console.log('Now checking on downloads in database not found within machine')
+
+                controllers.downloads.doGetAllPendingAndSearching().then(downloads => {
+                  downloads.forEach(download => {
+                    console.log(`Still looking for ${download.id}`)
+                  })
+                })
+              }).catch(error => {
+                console.log(error)
               })
             })
           })

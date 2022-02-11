@@ -113,6 +113,31 @@ class sonarr {
     })
   }
 
+  doGetSeriesEpisodes (mediaId, triesLeft = 5) {
+    return new Promise((resolve, reject) => {
+      this.api.http.get('/episode', {
+        params: {
+          seriesId: mediaId
+        }
+      }).then(data => {
+        if (data.data.length === 0 && triesLeft !== 0) {
+          const timeout = setTimeout(_ => {
+            this.doGetSeriesEpisodes(mediaId, triesLeft - 1).then(data => {
+              clearTimeout(timeout)
+              resolve(data)
+            }).catch(error => {
+              reject(error)
+            })
+          }, 5000)
+        } else {
+          resolve(data.data)
+        }
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  }
+
   doGetDownloadQueue () {
     return new Promise((resolve, reject) => {
       this.api.http.get('/queue').then(data => {
@@ -135,8 +160,9 @@ class sonarr {
 
             const content = {
               title: download.episode.title,
+              type: 'episode',
               downloadId: download.id,
-              mediaId: download.series.id,
+              mediaId: download.episode.id,
               info: `Season ${download.episode.seasonNumber} Episode ${download.episode.episodeNumber}`,
               size: download.size,
               resolution: download.quality.quality.resolution,
@@ -154,6 +180,7 @@ class sonarr {
               response[id] = {
                 title: seriesTitle,
                 type: 'series',
+                mediaId: download.series.id,
                 serviceId: download.series.tvdbId,
                 totalSize: download.size,
                 totalSizeLeft: download.sizeleft,
@@ -183,6 +210,21 @@ class sonarr {
   doGetAll () {
     return new Promise((resolve, reject) => {
       this.api.http.get('/series').then(data => {
+        resolve(data.data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  }
+
+  doDelete (mediaId) {
+    return new Promise((resolve, reject) => {
+      this.api.http.delete(`/series/${mediaId}`, {
+        params: {
+          id: mediaId,
+          deleteFiles: true
+        }
+      }).then(data => {
         resolve(data.data)
       }).catch(error => {
         reject(error)
