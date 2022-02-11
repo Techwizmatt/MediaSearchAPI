@@ -16,9 +16,31 @@ const downloads = {
       })
     })
   },
-  doAdd: async function (type, mediaId, userId) {
+  doAdd: async function (type, userId, mediaId, title) {
     return new Promise((resolve, reject) => {
-
+      models.downloads.create({
+        mediaId: mediaId,
+        userId: userId,
+        type: type,
+        title: title
+      }).then(_ => {
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  doGetAllActive: async function () {
+    return new Promise((resolve, reject) => {
+      models.downloads.findAll({
+        where: {
+          completedAt: null
+        }
+      }).then(data => {
+        resolve(data)
+      }).reject(error => {
+        reject(error)
+      })
     })
   }
 }

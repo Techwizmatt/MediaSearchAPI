@@ -141,7 +141,7 @@ class sonarr {
               sizeleft: download.sizeleft,
               timeleft: this._doConvertStringTimeToSeconds(download.timeleft),
               status: download.status,
-              trackedDownloadStatus: download.trackedDownloadStatus
+              notice: download.trackedDownloadStatus
             }
 
             if (String(id) in response) {
@@ -161,7 +161,26 @@ class sonarr {
 
         resolve(response)
       }).catch(error => {
-        console.log(error)
+        reject(error)
+      })
+    })
+  }
+
+  doGetFromMediaId (id) {
+    return new Promise((resolve, reject) => {
+      this.api.http.get(`/series/${id}`).then(data => {
+        resolve(data.data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  }
+
+  doGetAll () {
+    return new Promise((resolve, reject) => {
+      this.api.http.get('/series').then(data => {
+        resolve(data.data)
+      }).catch(error => {
         reject(error)
       })
     })

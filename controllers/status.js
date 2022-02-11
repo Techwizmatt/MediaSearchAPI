@@ -26,7 +26,7 @@ const status = {
   },
   doGetDownloads () {
     return new Promise((resolve, reject) => {
-      const downloads = [sonarr.doGetOrganizedDownloadQueue(), radarr.doGetDownloadQueue()]
+      const downloads = [sonarr.doGetOrganizedDownloadQueue(), radarr.doGetOrganizedDownloadQueue()]
 
       Promise.all(downloads).then(data => {
         resolve({

@@ -12,6 +12,24 @@ const movie = {
         reject(error)
       })
     })
+  },
+  doGetAll: async function () {
+    return new Promise((resolve, reject) => {
+      radarr.doGetAll().then(data => {
+        resolve(data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  doGet: async function (mediaId) {
+    return new Promise((resolve, reject) => {
+      radarr.doGetFromMediaId(mediaId).then(data => {
+        resolve(data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
   }
 }
 

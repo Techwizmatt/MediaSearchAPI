@@ -5,7 +5,8 @@ const libraries = {
   Radarr: require(path.join(process.cwd(), '/libraries/radarr')),
   Nzbget: require(path.join(process.cwd(), '/libraries/nzbget')),
   Sms: require(path.join(process.cwd(), '/libraries/sms')),
-  Plex: require(path.join(process.cwd(), '/libraries/plex'))
+  Plex: require(path.join(process.cwd(), '/libraries/plex')),
+  Unraid: require(path.join(process.cwd(), '/libraries/unraid'))
 }
 
 module.exports = libraries

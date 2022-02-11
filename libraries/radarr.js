@@ -16,6 +16,19 @@ class radarr {
     })
   }
 
+  /**
+   * Converts string time into seconds
+   * @param str - 'HH:MM:SS' Format
+   * @returns {Number}
+   */
+  _doConvertStringTimeToSeconds (str) {
+    const [hh = '0', mm = '0', ss = '0'] = (str || '0:0:0').split(':')
+    const hour = parseInt(hh, 10) || 0
+    const minute = parseInt(mm, 10) || 0
+    const second = parseInt(ss, 10) || 0
+    return (hour * 3600) + (minute * 60) + (second)
+  }
+
   _doForceMonitoring (id) {
     return new Promise((resolve, reject) => {
       this.api.http.post('/command', {
@@ -124,6 +137,61 @@ class radarr {
           includeUnknownMovieItems: true
         }
       }).then(data => {
+        resolve(data.data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  }
+
+  doGetOrganizedDownloadQueue () {
+    return new Promise((resolve, reject) => {
+      this.doGetDownloadQueue().then(data => {
+        const response = {}
+
+        if (data.length >= 1) {
+          data.forEach(download => {
+            const id = download.movie.tmdbId
+            const movieTitle = download.movie.title
+
+            response[id] = {
+              title: movieTitle,
+              totalSize: download.size,
+              totalSizeLeft: download.sizeleft,
+              downloads: [{
+                title: movieTitle,
+                info: download.movie.year,
+                size: download.size,
+                sizeLeft: download.sizeleft,
+                timeLeft: this._doConvertStringTimeToSeconds(download.timeleft),
+                resolution: download.quality.quality.resolution,
+                status: download.status,
+                notice: download.trackedDownloadStatus
+              }]
+            }
+          })
+        }
+
+        resolve(response)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  }
+
+  doGetFromMediaId (id) {
+    return new Promise((resolve, reject) => {
+      this.api.http.get(`/movie/${id}`).then(data => {
+        resolve(data.data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  }
+
+  doGetAll () {
+    return new Promise((resolve, reject) => {
+      this.api.http.get('/movie').then(data => {
         resolve(data.data)
       }).catch(error => {
         reject(error)
