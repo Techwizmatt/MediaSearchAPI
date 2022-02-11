@@ -19,43 +19,43 @@ class watcher {
 
               downloads.forEach(download => {
                 new Promise((resolve, reject) => {
-                  controllers.downloads.doGetAllByTypeAndMediaId(type, mediaId).then(downloads => {
-                    if (downloads.length === 0) {
-                      controllers.downloads.doAdd(type, 0, mediaId, download.downloadId, download.title).then(data => {
-                        resolve(data)
-                      }).catch(error => {
-                        reject(error)
-                      })
-                    } else {
-                      resolve(downloads)
-                    }
-                  }).catch(error => {
-                    reject(error)
-                  })
+                  // controllers.downloads.doGetAllByTypeAndMediaId(type, mediaId).then(downloads => {
+                  //   if (downloads.length === 0) {
+                  //     controllers.downloads.doAdd(type, 0, mediaId, download.downloadId, download.title).then(data => {
+                  //       resolve(data)
+                  //     }).catch(error => {
+                  //       reject(error)
+                  //     })
+                  //   } else {
+                  //     resolve(downloads)
+                  //   }
+                  // }).catch(error => {
+                  //   reject(error)
+                  // })
                 }).then(downloads => {
                   new Promise((resolve, reject) => {
                     downloads.forEach(data => {
                       const id = data.id
 
-                      if (download.status === 'Completed') {
-                        if (download.notice === 'Ok') {
-                          controllers.downloads.doUpdate(id, {
-                            completedAt: new Date()
-                          }).then(_ => {
-                            resolve()
-                          }).catch(error => {
-                            reject(error)
-                          })
-                        } else {
-                          controllers.downloads.doUpdate(id, {
-                            failedAt: new Date()
-                          }).then(_ => {
-                            resolve()
-                          }).catch(error => {
-                            reject(error)
-                          })
-                        }
-                      }
+                      // if (download.status === 'Completed') {
+                      //   if (download.notice === 'Ok') {
+                      //     controllers.downloads.doUpdate(id, {
+                      //       completedAt: new Date()
+                      //     }).then(_ => {
+                      //       resolve()
+                      //     }).catch(error => {
+                      //       reject(error)
+                      //     })
+                      //   } else {
+                      //     controllers.downloads.doUpdate(id, {
+                      //       failedAt: new Date()
+                      //     }).then(_ => {
+                      //       resolve()
+                      //     }).catch(error => {
+                      //       reject(error)
+                      //     })
+                      //   }
+                      // }
                     })
                   }).then(_ => {
                     resolve()
