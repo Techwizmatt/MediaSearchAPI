@@ -13,18 +13,18 @@ const series = {
       })
     })
   },
-  doGet: async function (mediaId) {
+  doGetAll: async function () {
     return new Promise((resolve, reject) => {
-      sonarr.doGetFromMediaId(mediaId).then(data => {
+      sonarr.doGetAll().then(data => {
         resolve(data)
       }).catch(error => {
         reject(error)
       })
     })
   },
-  doGetAll: async function () {
+  doGetSeries: async function (mediaId) {
     return new Promise((resolve, reject) => {
-      sonarr.doGetAll().then(data => {
+      sonarr.doGetSeriesFromMediaId(mediaId).then(data => {
         resolve(data)
       }).catch(error => {
         reject(error)

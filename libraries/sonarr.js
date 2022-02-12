@@ -197,7 +197,7 @@ class sonarr {
     })
   }
 
-  doGetFromMediaId (id) {
+  doGetSeriesFromMediaId (id) {
     return new Promise((resolve, reject) => {
       this.api.http.get(`/series/${id}`).then(data => {
         resolve(data.data)
