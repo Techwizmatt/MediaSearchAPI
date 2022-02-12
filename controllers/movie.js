@@ -39,6 +39,15 @@ const movie = {
         reject(error)
       })
     })
+  },
+  doRequest: async function (type, endpoint, extra) {
+    return new Promise((resolve, reject) => {
+      radarr.doRequest(type, endpoint, extra).then(data => {
+        resolve(data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
   }
 }
 

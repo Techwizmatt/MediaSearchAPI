@@ -115,6 +115,23 @@ const downloads = {
       })
     })
   },
+  doGetAllPendingAndDownloading: async function () {
+    return new Promise((resolve, reject) => {
+      models.downloads.findAll({
+        where: {
+          failedAt: null,
+          completedAt: null,
+          createdAt: {
+            [Sequelize.Op.gt]: new Date(Date.now() - ((60 * 60 * 1000) * 24))
+          }
+        }
+      }).then(pendingAndDownloading => {
+        resolve(pendingAndDownloading)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
   doGetAllPending: async function () {
     return new Promise((resolve, reject) => {
       models.downloads.findAll({
@@ -160,6 +177,36 @@ const downloads = {
         }
       }).then(download => {
         resolve(download)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  doGetAllPendingWithMediaId: async function (mediaId) {
+    return new Promise((resolve, reject) => {
+      models.downloads.findAll({
+        where: {
+          mediaId: mediaId,
+          downloadId: null
+        }
+      }).then(pending => {
+        resolve(pending)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  doGetAllDownloadingWithMediaId: async function (mediaId) {
+    return new Promise((resolve, reject) => {
+      models.downloads.findAll({
+        where: {
+          mediaId: mediaId,
+          downloadId: {
+            [Sequelize.Op.ne]: null
+          }
+        }
+      }).then(downloading => {
+        resolve(downloading)
       }).catch(error => {
         reject(error)
       })

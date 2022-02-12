@@ -38,4 +38,12 @@ router.delete('/', async (request, response) => {
   })
 })
 
+router.post('/request', async (request, response) => {
+  controllers.series.doRequest(request.body.type, request.body.endpoint, request.body.extra).then(data => {
+    response.status(200).json(data)
+  }).catch(error => {
+    response.status(500).json({ error: error.message })
+  })
+})
+
 module.exports = router

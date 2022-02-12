@@ -231,6 +231,20 @@ class sonarr {
       })
     })
   }
+
+  doRequest (type, endpoint, extra) {
+    return new Promise((resolve, reject) => {
+      try {
+        this.api.http[type](endpoint, extra).then(data => {
+          resolve(data.data)
+        }).catch(error => {
+          reject(error)
+        })
+      } catch (error) {
+        reject(error)
+      }
+    })
+  }
 }
 
 module.exports = sonarr

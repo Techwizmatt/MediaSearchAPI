@@ -48,6 +48,15 @@ const series = {
         reject(error)
       })
     })
+  },
+  doRequest: async function (type, endpoint, extra) {
+    return new Promise((resolve, reject) => {
+      sonarr.doRequest(type, endpoint, extra).then(data => {
+        resolve(data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
   }
 }
 

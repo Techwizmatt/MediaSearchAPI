@@ -24,4 +24,12 @@ router.get('/downloads', async (request, response) => {
   })
 })
 
+router.get('/downloads/pending', async (request, response) => {
+  controllers.downloads.doGetAllPendingAndDownloading().then(data => {
+    response.status(200).json(data)
+  }).catch(error => {
+    response.status(500).json({ error: error.message })
+  })
+})
+
 module.exports = router

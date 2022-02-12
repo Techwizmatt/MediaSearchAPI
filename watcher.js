@@ -92,9 +92,21 @@ class watcher {
 
                 console.log('Now checking on downloads in database not found within machine')
 
-                controllers.downloads.doGetAllPendingAndSearching().then(downloads => {
-                  downloads.forEach(download => {
-                    console.log(`Still looking for ${download.id}`)
+                controllers.downloads.doGetAllPendingAndSearching().then(pendingDownloads => {
+                  pendingDownloads.forEach(download => {
+                    const downloadMediaId = download.mediaId
+
+                    controllers.downloads.doGetAllPendingWithMediaId(downloadMediaId).then(pending => {
+                      if (pending.length >= 1) {
+                        pending.forEach(pend => {
+                          controllers.downloads.doUpdate(pend.id, {
+                            failedAt: new Date()
+                          }).then(_ => {
+                            console.log(`${pend.id} has been marked as failed`)
+                          })
+                        })
+                      }
+                    })
                   })
                 })
               }).catch(error => {
