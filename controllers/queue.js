@@ -71,6 +71,78 @@ const queue = {
       })
     })
   },
+  doGetAllWithMedia: async function () {
+    return new Promise((resolve, reject) => {
+      models.queueStatuses.findOne({
+        where: {
+          key: 'complete'
+        }
+      }).then(complete => {
+        models.queueStatuses.findOne({
+          where: {
+            key: 'failed'
+          }
+        }).then(failed => {
+          const completeStatusId = complete.id
+          const failedId = failed.id
+
+          models.queue.findAll({
+            raw: true,
+            where: {
+              queueStatusId: {
+                [Sequelize.Op.not]: [completeStatusId, failedId]
+              },
+              createdAt: {
+                [Sequelize.Op.gt]: new Date(Date.now() - ((60 * 60 * 1000) * 24))
+              }
+            }
+          }).then(queue => {
+            const addMedia = []
+
+            queue.forEach(item => {
+              addMedia.push(new Promise((resolve, reject) => {
+                const parentMediaId = item.parentMediaId
+                const mediaId = item.mediaId
+                const type = item.type
+
+                if (type === 'series') {
+                  sonarr.doGetSeriesEpisode(mediaId).then(media => {
+                    item.media = media
+
+                    resolve(item)
+                  }).catch(error => {
+                    reject(error)
+                  })
+                } else if (type === 'movie') {
+                  radarr.doGetFromMediaId(mediaId).then(media => {
+                    item.media = media
+
+                    resolve(item)
+                  }).catch(error => {
+                    reject(error)
+                  })
+                } else {
+                  resolve(item)
+                }
+              }))
+            })
+
+            Promise.all(addMedia).then(queueWithMedia => {
+              resolve(queueWithMedia)
+            }).catch(error => {
+              reject(error)
+            })
+          }).catch(error => {
+            reject(error)
+          })
+        }).catch(error => {
+          reject(error)
+        })
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
   doMatchQueues: async function () {
     return new Promise((resolve, reject) => {
       nzbget.doGetDownloads().then(nzbgetDownloads => {
@@ -279,6 +351,47 @@ const queue = {
         } else {
           resolve()
         }
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  doCheckQueuesTimeout: async function () {
+    return new Promise((resolve, reject) => {
+      models.queueStatuses.findOne({
+        where: {
+          key: 'complete'
+        }
+      }).then(complete => {
+        models.queueStatuses.findOne({
+          where: {
+            key: 'failed'
+          }
+        }).then(failed => {
+          const completeStatusId = complete.id
+          const failedId = failed.id
+
+          models.queue.update({
+            queueStatusId: failedId
+          }, {
+            raw: true,
+            where: {
+              nzbgetId: null,
+              queueStatusId: {
+                [Sequelize.Op.not]: [completeStatusId, failedId]
+              },
+              createdAt: {
+                [Sequelize.Op.lt]: new Date(Date.now() - ((60 * 60 * 1000) * 24))
+              }
+            }
+          }).then(_ => {
+            resolve()
+          }).catch(error => {
+            reject(error)
+          })
+        }).catch(error => {
+          reject(error)
+        })
       }).catch(error => {
         reject(error)
       })

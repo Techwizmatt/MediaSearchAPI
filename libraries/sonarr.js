@@ -219,6 +219,16 @@ class sonarr {
     })
   }
 
+  doGetSeriesEpisode (mediaId) {
+    return new Promise((resolve, reject) => {
+      this.api.http.get(`/episode/${mediaId}`).then(data => {
+        resolve(data.data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  }
+
   doGetSeriesEpisodeFile (mediaId) {
     return new Promise((resolve, reject) => {
       this.api.http.get(`/episode/${mediaId}`).then(data => {

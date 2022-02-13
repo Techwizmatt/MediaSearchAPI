@@ -22,6 +22,7 @@ const models = {
   preferences: sequelize.import(path.join(process.cwd(), '/models/preferences')),
   searchHistory: sequelize.import(path.join(process.cwd(), '/models/searchHistory')),
   users: sequelize.import(path.join(process.cwd(), '/models/users')),
+  media: sequelize.import(path.join(process.cwd(), '/models/media')),
   queue: sequelize.import(path.join(process.cwd(), '/models/queue')),
   queueStatuses: sequelize.import(path.join(process.cwd(), '/models/queueStatuses')),
   usersPreferences: sequelize.import(path.join(process.cwd(), '/models/usersPreferences'))

@@ -11,9 +11,17 @@ class watcher {
     this.job = new cron.CronJob(this.cronArg, function () {
       new Promise((resolve, reject) => {
         console.log(chalk.green('---=== WATCHER STARTED ===---'))
-        controllers.queue.doMatchQueues().then(_ => {
-          controllers.queue.doCheckQueuesComplete().then(_ => {
-            resolve()
+        controllers.media.doUpdateAllMedia().then(_ => {
+          controllers.queue.doMatchQueues().then(_ => {
+            controllers.queue.doCheckQueuesComplete().then(_ => {
+              controllers.queue.doCheckQueuesTimeout().then(_ => {
+                resolve()
+              }).catch(error => {
+                reject(error)
+              })
+            }).catch(error => {
+              reject(error)
+            })
           }).catch(error => {
             reject(error)
           })

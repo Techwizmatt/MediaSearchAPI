@@ -7,5 +7,6 @@ module.exports = {
   series: require(path.join(process.cwd(), '/controllers/series')),
   movie: require(path.join(process.cwd(), '/controllers/movie')),
   users: require(path.join(process.cwd(), '/controllers/users')),
-  queue: require(path.join(process.cwd(), '/controllers/queue'))
+  queue: require(path.join(process.cwd(), '/controllers/queue')),
+  media: require(path.join(process.cwd(), '/controllers/media'))
 }
