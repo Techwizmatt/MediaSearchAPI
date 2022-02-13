@@ -113,16 +113,16 @@ class sonarr {
     })
   }
 
-  doGetSeriesEpisodes (mediaId, triesLeft = 5) {
+  doGetSeriesEpisodes (parentMediaId, triesLeft = 5) {
     return new Promise((resolve, reject) => {
       this.api.http.get('/episode', {
         params: {
-          seriesId: mediaId
+          seriesId: parentMediaId
         }
       }).then(data => {
         if (data.data.length === 0 && triesLeft !== 0) {
           const timeout = setTimeout(_ => {
-            this.doGetSeriesEpisodes(mediaId, triesLeft - 1).then(data => {
+            this.doGetSeriesEpisodes(parentMediaId, triesLeft - 1).then(data => {
               clearTimeout(timeout)
               resolve(data)
             }).catch(error => {
@@ -157,12 +157,14 @@ class sonarr {
           data.forEach(download => {
             const id = download.series.id
             const seriesTitle = download.series.title
+            const file = download.title
 
             const content = {
               title: download.episode.title,
               type: 'episode',
               downloadId: download.id,
               mediaId: download.episode.id,
+              filename: file,
               info: `Season ${download.episode.seasonNumber} Episode ${download.episode.episodeNumber}`,
               size: download.size,
               resolution: download.quality.quality.resolution,
@@ -180,7 +182,7 @@ class sonarr {
               response[id] = {
                 title: seriesTitle,
                 type: 'series',
-                mediaId: download.series.id,
+                parentMediaId: download.series.id,
                 serviceId: download.series.tvdbId,
                 totalSize: download.size,
                 totalSizeLeft: download.sizeleft,
@@ -211,6 +213,44 @@ class sonarr {
     return new Promise((resolve, reject) => {
       this.api.http.get('/series').then(data => {
         resolve(data.data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  }
+
+  doGetSeriesEpisodeFile (mediaId) {
+    return new Promise((resolve, reject) => {
+      this.api.http.get(`/episode/${mediaId}`).then(data => {
+        resolve(data.data.episodeFile === undefined ? null : data.data.episodeFile)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  }
+
+  doGetAllWithEpisodes () {
+    return new Promise((resolve, reject) => {
+      this.api.http.get('/series').then(data => {
+        const episodes = []
+
+        data.data.forEach(series => {
+          episodes.push(new Promise((resolve, reject) => {
+            const seriesId = series.id
+            this.doGetSeriesEpisodes(seriesId).then(episodes => {
+              series.episodes = episodes
+              resolve(series)
+            }).catch(error => {
+              reject(error)
+            })
+          }))
+        })
+
+        Promise.all(episodes).then(data => {
+          resolve(data)
+        }).catch(error => {
+          reject(error)
+        })
       }).catch(error => {
         reject(error)
       })

@@ -4,6 +4,7 @@ const sequelize = require(path.join(process.cwd(), '/models')).sequelize
 const models = require(path.join(process.cwd(), '/models')).models
 const libs = require(path.join(process.cwd(), '/libraries'))
 
+const nzbget = new libs.Nzbget()
 const sonarr = new libs.Sonarr()
 const radarr = new libs.Radarr()
 
@@ -75,6 +76,15 @@ const downloads = {
       models.downloads.getAll({
         raw: true
       }).then(data => {
+        resolve(data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  doGetNzbgetDownloads () {
+    return new Promise((resolve, reject) => {
+      nzbget.doGetDownloads().then(data => {
         resolve(data)
       }).catch(error => {
         reject(error)

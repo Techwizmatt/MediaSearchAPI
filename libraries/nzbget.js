@@ -33,6 +33,40 @@ class nzbget {
       })
     })
   }
+
+  doGetDownloads () {
+    return new Promise((resolve, reject) => {
+      this.client.RPCClient.call({
+        jsonrpc: '2.0',
+        method: 'listgroups',
+        params: {},
+        id: 0
+      }, (error, response) => {
+        if (!error) {
+          resolve(response.result)
+        } else {
+          reject(error)
+        }
+      })
+    })
+  }
+
+  doDeleteDownload (nzbgetId) {
+    return new Promise((resolve, reject) => {
+      // this.client.RPCClient.call({
+      //   jsonrpc: '2.0',
+      //   method: 'editqueue',
+      //   params: { params: ['GroupPause', '', [nzbgetId]] },
+      //   id: 0
+      // }, (error, response) => {
+      //   if (!error) {
+      //     resolve(response.result)
+      //   } else {
+      //     reject(error)
+      //   }
+      // })
+    })
+  }
 }
 
 module.exports = nzbget
