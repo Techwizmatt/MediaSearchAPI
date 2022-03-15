@@ -1,19 +1,37 @@
 const path = require('path')
 const cron = require('cron')
+const chalk = require('chalk')
 const libs = require(path.join(process.cwd(), '/libraries'))
 const controllers = require(path.join(process.cwd(), '/controllers'))
 
 class watcher {
-  constructor (repeatMin) {
-    this.repeatMin = repeatMin
+  constructor (cronArg) {
+    this.cronArg = cronArg
 
-    this.job = new cron.CronJob(`*/${this.repeatMin} * * * *`, function () {
+    this.job = new cron.CronJob(this.cronArg, function () {
       new Promise((resolve, reject) => {
-        resolve()
+        console.log(chalk.green('---=== WATCHER STARTED ===---'))
+        controllers.media.doUpdateAllMedia().then(_ => {
+          controllers.queue.doMatchQueues().then(_ => {
+            controllers.queue.doCheckQueuesComplete().then(_ => {
+              controllers.queue.doCheckQueuesTimeout().then(_ => {
+                resolve()
+              }).catch(error => {
+                reject(error)
+              })
+            }).catch(error => {
+              reject(error)
+            })
+          }).catch(error => {
+            reject(error)
+          })
+        }).catch(error => {
+          reject(error)
+        })
       }).then(_ => {
-
+        console.log(chalk.green('---=== WATCHER FINISHED ===---'))
       }).catch(error => {
-        console.log(`Watcher error: ${error.message}`)
+        console.log(error)
       })
     }, null, null, null, null, true)
   }

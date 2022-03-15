@@ -157,7 +157,7 @@ class radarr {
             response[id] = {
               title: movieTitle,
               type: 'movie',
-              mediaId: download.movie.id,
+              parentMediaId: download.movie.id,
               serviceId: download.movie.tmdbId,
               downloadId: download.id,
               totalSize: download.size,
@@ -167,6 +167,7 @@ class radarr {
                 type: 'movie',
                 mediaId: download.movie.id,
                 downloadId: download.id,
+                filename: download.title,
                 info: download.movie.year,
                 size: download.size,
                 sizeLeft: download.sizeleft,
@@ -190,6 +191,16 @@ class radarr {
     return new Promise((resolve, reject) => {
       this.api.http.get(`/movie/${id}`).then(data => {
         resolve(data.data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  }
+
+  doGetMovieFile (mediaId) {
+    return new Promise((resolve, reject) => {
+      this.api.http.get(`/movie/${mediaId}`).then(data => {
+        resolve(data.data.movieFile === undefined ? null : data.data.movieFile)
       }).catch(error => {
         reject(error)
       })
