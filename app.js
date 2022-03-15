@@ -50,10 +50,4 @@ const httpsServer = https.createServer(options, app)
 
 httpsServer.listen(3333, () => {
   console.log('Server running on port 3333')
-  const watcher = new Watcher(1)
-  watcher.doStart().then(_ => {
-    console.log('Watcher started')
-  }).catch(error => {
-    console.log(`Unable to start watcher: ${error.message}`)
-  })
 })
