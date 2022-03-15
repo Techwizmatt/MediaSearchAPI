@@ -37,8 +37,8 @@ let options
 
 try {
   options = {
-    key: fs.readFileSync(path.join(process.cwd(), '/ssl/*.techhost.co.key'), 'utf8'),
-    cert: fs.readFileSync(path.join(process.cwd(), '/ssl/*.techhost.co.crt'), 'utf8'),
+    key: fs.readFileSync(path.join(process.cwd(), '/ssl/techhost.co.key'), 'utf8'),
+    cert: fs.readFileSync(path.join(process.cwd(), '/ssl/techhost.co.crt'), 'utf8'),
     ca: fs.readFileSync(path.join(process.cwd(), '/ssl/gd_bundle-g2-g1.crt'), 'utf8')
   }
 } catch (error) {
