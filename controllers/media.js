@@ -7,6 +7,7 @@ const libs = require(path.join(process.cwd(), '/libraries'))
 const nzbget = new libs.Nzbget()
 const sonarr = new libs.Sonarr()
 const radarr = new libs.Radarr()
+const fileBrowser = new libs.FileBrowser()
 
 const media = {
   doUpdateAllSeries: async function () {
@@ -141,6 +142,17 @@ const media = {
     return new Promise((resolve, reject) => {
       Promise.all([media.doUpdateAllSeries(), media.doUpdateAllMovies()]).then(data => {
         resolve(data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  doShare: async function (path) {
+    return new Promise((resolve, reject) => {
+      fileBrowser.doShareForDay(path).then(url => {
+        resolve({
+          location: url
+        })
       }).catch(error => {
         reject(error)
       })

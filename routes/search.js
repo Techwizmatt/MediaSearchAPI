@@ -11,4 +11,12 @@ router.get('/', async (request, response) => {
   })
 })
 
+router.post('/share', async (request, response) => {
+  controllers.media.doShare(request.body.path).then(data => {
+    response.status(200).json(data)
+  }).catch(error => {
+    response.status(500).json({ error: error.message })
+  })
+})
+
 module.exports = router
