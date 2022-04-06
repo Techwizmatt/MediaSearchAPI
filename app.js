@@ -9,7 +9,6 @@ const app = require('express')()
 const parser = require('body-parser')
 const https = require('https')
 const fs = require('fs')
-const Watcher = require(path.join(process.cwd(), '/watcher'))
 
 app.use(cors({
   origin: '*', optionsSuccessStatus: 200
