@@ -37,8 +37,8 @@ let options
 
 try {
   options = {
-    key: fs.readFileSync(path.join(process.cwd(), '/ssl/*.techhost.co.key'), 'utf8'),
-    cert: fs.readFileSync(path.join(process.cwd(), '/ssl/*.techhost.co.crt'), 'utf8'),
+    key: fs.readFileSync(path.join(process.cwd(), '/ssl/techhost.co.key'), 'utf8'),
+    cert: fs.readFileSync(path.join(process.cwd(), '/ssl/techhost.co.crt'), 'utf8'),
     ca: fs.readFileSync(path.join(process.cwd(), '/ssl/gd_bundle-g2-g1.crt'), 'utf8')
   }
 } catch (error) {
@@ -50,10 +50,4 @@ const httpsServer = https.createServer(options, app)
 
 httpsServer.listen(3333, () => {
   console.log('Server running on port 3333')
-  const watcher = new Watcher('*/15 * * * * *') // Every XXX seconds
-  watcher.doStart().then(_ => {
-    console.log('Watcher started')
-  }).catch(error => {
-    console.log(`Unable to start watcher: ${error.message}`)
-  })
 })
