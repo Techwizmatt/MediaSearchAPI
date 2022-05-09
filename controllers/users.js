@@ -26,7 +26,7 @@ const users = {
             },
             raw: true
           }).then(_ => {
-            new libs.Sms().doSend(phoneNumber, `(Plex Media Search) Hey ${data.firstName}, Your login code is ${code}`).then(_ => {
+            new libs.Sms().doSend(phoneNumber, `(Purgatory Media) Hey ${data.firstName}, Your login code is ${code}`).then(_ => {
               resolve()
             }).catch(error => {
               reject(error)
@@ -110,7 +110,7 @@ const users = {
             email: user.email,
             plexInviteToken: data.inviteToken
           }).then(createdUser => {
-            new libs.Sms().doSend(user.phone, `Hey ${createdUser.firstName}, You have been added to Plex Media Search. Check it out at https://techwizmatt.info/plex`).then(_ => {
+            new libs.Sms().doSend(user.phone, `Hey ${createdUser.firstName}, You have been added to Purgatory Media. Check it out at https://www.purgatory.media`).then(_ => {
               resolve(data)
             }).catch(error => {
               reject(error)
